@@ -1,12 +1,12 @@
-*
- * Get project items by ID
+Get project list
  */
-appRouter.get("/:projectId", function(req, res) {
+appRouter.get("/", function(req, res) {
+
 	let param = {
 		TableName: DB_NAME,
 		KeyConditionExpression: 'id = :id',
 		ExpressionAttributeValues: {
-			':id': `${INTAKE_FORM}#${req.params.projectId}`
+			':id': `${DB_PROJECT_LIST}#${DB_ITEM_PROJECT_LIST}`
 		}
 	};
 
@@ -14,18 +14,7 @@ appRouter.get("/:projectId", function(req, res) {
 		if (err) {
 			res.send(`Unable to query. Error: ${JSON.stringify(err, null, 2)}`);
 		} else {
-			let projectData = {};
-			if (data.Count) {
-				let projectItem = data.Items[data.Count - 1].data;
-				projectData = { item: projectItem, count: data.Count };
-
-				if (data.Items[data.Count - 1].changed) {
-					projectData.changedBy = data.Items[data.Count - 1].changed;
-				}
-			} else {
-				projectData = { item: {}, count: 0 };
-			}
-			res.json(projectData);
+			res.send( data.Count ? `${JSON.stringify(data.Items[data.Count - 1])}` : 'No projects found');
 		}
 	});
 });
